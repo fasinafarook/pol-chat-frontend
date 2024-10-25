@@ -1,14 +1,12 @@
-// src/components/Navbar.tsx
 import React from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { removeToken } from '../utils/auth';
 
 interface NavbarProps {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
+export default function Navbar({ setIsAuthenticated }: NavbarProps) {
   const navigate = useNavigate();
   
   const handleLogout = () => {
@@ -19,38 +17,32 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   };
   
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-6 py-3">
-        <div className="flex items-center justify-between">
+    <nav className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <motion.svg
-              whileHover={{ rotate: 180 }}
-              className="h-8 w-8 text-indigo-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </motion.svg>
-            <span className="ml-2 text-2xl font-semibold text-gray-800">Poll App</span>
+            <Link to="/home" className="flex-shrink-0 flex items-center">
+              <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span className="ml-2 text-xl font-semibold text-gray-900">PollChat</span>
+            </Link>
           </div>
           <div className="flex items-center">
-            <Link to="/home" className="text-gray-800 text-sm font-semibold hover:text-indigo-600 mr-4">Home</Link>
-            <Link to="/all-polls" className="text-gray-800 text-sm font-semibold hover:text-indigo-600 mr-4">Polls</Link>
-            <Link to="/your-polls" className="text-gray-800 text-sm font-semibold hover:text-indigo-600 mr-4">Create</Link>
-            <Link to="/chat" className="text-gray-800 text-sm font-semibold hover:text-indigo-600 mr-4">ChatBox</Link>
-
-            <button
-              onClick={handleLogout}
-              className="text-gray-800 text-sm font-semibold hover:text-indigo-600 focus:outline-none"
-            >
-              Logout
-            </button>
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <NavLink to="/home">Home</NavLink>
+              <NavLink to="/all-polls">Polls</NavLink>
+              <NavLink to="/your-polls">Create</NavLink>
+              <NavLink to="/chat">ChatBox</NavLink>
+            </div>
+            <div className="ml-6 flex items-center">
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -58,4 +50,13 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   );
 }
 
-export default Navbar;
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
+    >
+      {children}
+    </Link>
+  );
+}

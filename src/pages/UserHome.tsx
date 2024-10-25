@@ -1,49 +1,42 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { removeToken } from '../utils/auth'
-import { motion } from 'framer-motion'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { removeToken } from '../utils/auth';
+import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 interface User {
-    username: string;
-    email: string;
-  }
-  
-  interface UserHomeProps {
-    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>; // Correct type
-  }
-  
-  const UserHome: React.FC<UserHomeProps> = ({ setIsAuthenticated }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    }, []);
-  
-    const handleLogout = () => {
-      removeToken();
-      localStorage.removeItem('user');
-      setIsAuthenticated(false);
-      navigate('/login');
-    };
-  
-    return (
-        <>
-                <Navbar setIsAuthenticated={setIsAuthenticated} />
+  username: string;
+  email: string;
+}
 
-      <div className="min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white">
+interface UserHomeProps {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const UserHome: React.FC<UserHomeProps> = ({ setIsAuthenticated }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  return (
+    <>
+      <Navbar setIsAuthenticated={setIsAuthenticated} />
+
+      <div className="min-h-screen bg-gray-100 text-white">
         <main className="container mx-auto px-4 py-8">
+          {/* Welcome Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-white bg-opacity-10 rounded-lg shadow-lg p-8 backdrop-blur-md"
+            className="bg-gray-700 rounded-lg shadow-lg p-8 mb-12"
           >
             <h1 className="text-4xl font-bold mb-4">Welcome, {user?.username || 'User'}!</h1>
             <p className="text-xl mb-8">You're now logged in. Explore and connect.</p>
@@ -58,21 +51,54 @@ interface User {
                 Your Polls
               </NavButton>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:-translate-y-1"
-            >
-              Logout
-            </motion.button>
           </motion.div>
+
+          {/* Features Section */}
+          <section className="bg-white py-20">
+            <div className="max-w-6xl mx-auto px-8">
+              <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+                Why Choose PollChat?
+              </h2>
+              <div className="grid md:grid-cols-3 gap-12">
+                {[
+                  {
+                    title: "Real-time Results",
+                    description:
+                      "Watch poll results update instantly as participants respond.",
+                  },
+                  {
+                    title: "Customizable Polls",
+                    description:
+                      "Create polls that fit your unique needs with our flexible options.",
+                  },
+                  {
+                    title: "Engaging Discussions",
+                    description:
+                      "Foster meaningful conversations around your poll topics.",
+                  },
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    className="text-center bg-gray-100 rounded-lg shadow-lg p-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 * index, duration: 0.6 }}
+                  >
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
         </main>
       </div>
-    <Footer />
+      <Footer />
     </>
-    );
-  };
+  );
+};
 
 const NavButton: React.FC<{ onClick: () => void; icon: string; children: React.ReactNode }> = ({
   onClick,
@@ -83,13 +109,11 @@ const NavButton: React.FC<{ onClick: () => void; icon: string; children: React.R
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
     onClick={onClick}
-    className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-md text-white font-bold py-4 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center"
+    className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-4 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center"
   >
     <span className="text-2xl mr-2">{icon}</span>
     {children}
   </motion.button>
-)
+);
 
-
-
-export default UserHome
+export default UserHome;

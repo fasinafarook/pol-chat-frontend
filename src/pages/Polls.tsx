@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PollCard from '../components/PollCard'; // Import the new PollCard component
-import { io } from 'socket.io-client';
-const socket = io('http://localhost:5000');
+import { initSocket, getSocket ,disconnectSocket} from '../services/socket'; // Import your socket service
+
 
 
 interface Poll {
@@ -32,7 +32,8 @@ const YourPolls: React.FC<YourPollsProps> = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.connect();  // Ensure socket is connected
+    initSocket(); // Initialize the socket connection
+    const socket = getSocket(); // Get the socket instance
     fetchUserPolls();
     loadSelectedOptions();
   
@@ -43,7 +44,7 @@ const YourPolls: React.FC<YourPollsProps> = ({ setIsAuthenticated }) => {
     });
   
     return () => {
-      socket.disconnect();
+        disconnectSocket()
     };
   }, []);
   
@@ -98,7 +99,9 @@ const YourPolls: React.FC<YourPollsProps> = ({ setIsAuthenticated }) => {
   const handleVote = async (pollId: string, optionIndex: number) => {
     try {
       await votePoll(pollId, optionIndex);
+      const socket = getSocket(); // Get the socket instance
       socket.emit('vote', pollId); // Emit vote event to server
+
       const updatedOptions = {
         ...selectedOptions,
         [pollId]: optionIndex,
@@ -111,7 +114,7 @@ const YourPolls: React.FC<YourPollsProps> = ({ setIsAuthenticated }) => {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+    <div className="min-h-screen  bg-gray-100 flex flex-col">
       <Navbar setIsAuthenticated={setIsAuthenticated} />
       <main className="flex-grow container mx-auto px-4 py-8">
         <motion.h1

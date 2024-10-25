@@ -4,11 +4,7 @@ import { getPolls, votePoll } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PollCard from '../components/PollCard';
-import { io } from 'socket.io-client';
-const socket = io('http://localhost:5000');
-
-// import socket from '../services/socket';
-
+import { initSocket, getSocket, disconnectSocket } from '../services/socket';
 
 interface Poll {
   _id: string;
@@ -26,29 +22,25 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: number }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOption, setSortOption] = useState<'mostVoted' | 'leastVoted'>('mostVoted'); // State for sorting
-  const pollsPerPage = 8; // Set the number of polls per page
+  const [sortOption, setSortOption] = useState<'mostVoted' | 'leastVoted'>('mostVoted');
+  const pollsPerPage = 8;
   const navigate = useNavigate();
 
-
-
   useEffect(() => {
-    socket.connect();  // Ensure socket is connected
+    initSocket();
+    const socket = getSocket();
     fetchPolls();
     loadSelectedOptions();
-  
-    // Listen for real-time poll updates
+
     socket.on('pollUpdated', (updatedPollId) => {
-      console.log('Poll updated:', updatedPollId);  // Add this log to verify updates
-      fetchPolls(); // Re-fetch polls on update
+      fetchPolls();
     });
-  
+
     return () => {
-      socket.disconnect();
+      disconnectSocket();
     };
   }, []);
-  
-  
+
   const fetchPolls = async () => {
     try {
       const response = await getPolls();
@@ -68,7 +60,8 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
   const handleVote = async (pollId: string, optionIndex: number) => {
     try {
       await votePoll(pollId, optionIndex);
-      socket.emit('vote', pollId); // Emit vote event to server
+      const socket = getSocket();
+      socket.emit('vote', pollId);
 
       const updatedOptions = {
         ...selectedOptions,
@@ -82,16 +75,13 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
     }
   };
 
-  // Calculate the polls to display for the current page
   const indexOfLastPoll = currentPage * pollsPerPage;
   const indexOfFirstPoll = indexOfLastPoll - pollsPerPage;
 
-  // Filter polls based on search term
-  const filteredPolls = polls.filter(poll =>
+  const filteredPolls = polls.filter((poll) =>
     poll.question.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sort polls based on votes
   const sortedPolls = filteredPolls.sort((a, b) => {
     const totalVotesA = a.options.reduce((sum, option) => sum + option.votes, 0);
     const totalVotesB = b.options.reduce((sum, option) => sum + option.votes, 0);
@@ -99,11 +89,8 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
   });
 
   const currentPolls = sortedPolls.slice(indexOfFirstPoll, indexOfLastPoll);
-  
-  // Calculate total pages
   const totalPages = Math.ceil(sortedPolls.length / pollsPerPage);
 
-  // Handle page change
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
@@ -160,13 +147,9 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
               style={{
-                margin: '0 5px',
-                padding: '5px 10px',
-                backgroundColor: currentPage === index + 1 ? '#1877f2' : '#fff',
-                color: currentPage === index + 1 ? '#fff' : '#1877f2',
-                border: '1px solid #1877f2',
-                borderRadius: '5px',
-                cursor: 'pointer',
+                ...styles.pageButton,
+                backgroundColor: currentPage === index + 1 ? '#3498db' : '#fff',
+                color: currentPage === index + 1 ? '#fff' : '#3498db',
               }}
             >
               {index + 1}
@@ -182,44 +165,55 @@ const AllPolls: React.FC<CreatePollProps> = ({ setIsAuthenticated }) => {
 const styles = {
   pageContainer: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f9f9f9',
     minHeight: '100vh',
     padding: '40px 20px',
     textAlign: 'center' as const,
   },
   header: {
     fontSize: '36px',
-    color: '#1877f2',
+    color: '#3498db',
     marginBottom: '20px',
+    fontWeight: '600',
   },
   searchInput: {
     margin: '20px 0',
-    padding: '10px',
+    padding: '12px',
     fontSize: '16px',
-    width: '300px',
-    border: '1px solid #ccc',
+    width: '320px',
+    border: '2px solid #3498db',
     borderRadius: '5px',
+    outline: 'none',
+    transition: 'border-color 0.3s',
+    '&:focus': {
+      borderColor: '#2980b9',
+    },
   },
   sortingContainer: {
     marginBottom: '20px',
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '10px',
   },
   button: {
-    margin: '0 5px',
-    padding: '10px 15px',
+    padding: '12px 20px',
     backgroundColor: '#fff',
-    color: '#1877f2',
-    border: '1px solid #1877f2',
+    color: '#3498db',
+    border: '2px solid #3498db',
     borderRadius: '5px',
     cursor: 'pointer',
+    transition: 'background-color 0.3s, color 0.3s',
+    '&:hover': {
+      backgroundColor: '#3498db',
+      color: '#fff',
+    },
   },
   activeButton: {
-    margin: '0 5px',
-    padding: '10px 15px',
-    backgroundColor: '#1877f2',
+    padding: '12px 20px',
+    backgroundColor: '#3498db',
     color: '#fff',
-    border: '1px solid #1877f2',
+    border: '2px solid #3498db',
     borderRadius: '5px',
-    cursor: 'pointer',
   },
   pollsGrid: {
     display: 'grid',
@@ -231,6 +225,14 @@ const styles = {
     marginTop: '20px',
     display: 'flex',
     justifyContent: 'center',
+  },
+  pageButton: {
+    margin: '0 5px',
+    padding: '10px 15px',
+    border: '1px solid #3498db',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s, color 0.3s',
   },
 };
 

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../src/services/api';
 import { setToken } from '../../src/utils/auth';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface LoginProps {
   setIsAuthenticated: (value: boolean) => void;
@@ -11,24 +12,25 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
-  // Add styles inside useEffect within the component
   useEffect(() => {
     const styles = `
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
       :root {
-        --primary-color: #3498db;
-        --secondary-color: #2980b9;
-        --background-color: #f0f4f8;
-        --text-color: #333;
-        --error-color: #e74c3c;
-        --glass-color: rgba(255, 255, 255, 0.8);
-        --border-color: rgba(255, 255, 255, 0.4);
+        --primary-color: #3498db; /* Primary button color */
+        --background-color: #f0f4f8; /* Light background color */
+        --text-color: #333; /* Text color */
+        --error-color: #e74c3c; /* Error color */
+        --border-color: rgba(0, 0, 0, 0.1); /* Border color */
       }
 
       body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #74b9ff, #81ecec);
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--background-color);
         color: var(--text-color);
         display: flex;
         justify-content: center;
@@ -38,106 +40,72 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
       }
 
       .login-container {
-        background: var(--glass-color);
-        backdrop-filter: blur(12px);
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        padding: 3rem;
+        background: #fff; /* Solid background for the login box */
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
         width: 100%;
-        max-width: 450px;
-        border: 1px solid var(--border-color);
-        animation: slideIn 0.6s ease-in-out;
-      }
-
-      .login-form {
-        display: flex;
-        flex-direction: column;
+        max-width: 400px;
       }
 
       .login-title {
         text-align: center;
         color: var(--primary-color);
-        margin-bottom: 2rem;
-        font-size: 2rem;
-        letter-spacing: 1px;
-        font-weight: bold;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
       }
 
       .input-group {
-        position: relative;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
       }
 
       .input-field {
         width: 100%;
-        padding: 1.2rem;
-        border: none;
-        border-radius: 6px;
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
         font-size: 1rem;
-        background: rgba(255, 255, 255, 0.2);
-        color: var(--text-color);
-        transition: all 0.3s ease-in-out;
+        transition: border 0.3s ease;
       }
 
       .input-field:focus {
+        border-color: var(--primary-color);
         outline: none;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        background: rgba(255, 255, 255, 0.5);
-      }
-
-      .input-label {
-        position: absolute;
-        left: 1rem;
-        top: 1.2rem;
-        color: #777;
-        pointer-events: none;
-        transition: 0.3s ease all;
-        font-size: 1rem;
-        background-color: transparent;
-      }
-
-      .input-field:focus ~ .input-label,
-      .input-field:not(:placeholder-shown) ~ .input-label {
-        top: -0.6rem;
-        left: 0.9rem;
-        font-size: 0.8rem;
-        color: var(--primary-color);
-        padding: 0 0.3rem;
-        background-color: white;
-        border-radius: 4px;
       }
 
       .submit-button {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
+        background: var(--primary-color);
+        color: #fff;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
         padding: 1rem;
         font-size: 1.1rem;
         cursor: pointer;
-        transition: background 0.3s, transform 0.2s;
+        font-weight: 600;
+        width: 100%;
+        transition: background 0.3s ease;
       }
 
       .submit-button:hover {
-        background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-        transform: scale(1.05);
+        background: darken(var(--primary-color), 10%);
       }
 
       .error-message {
         color: var(--error-color);
         text-align: center;
-        margin-bottom: 1.2rem;
-        animation: fadeIn 0.5s;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
       }
 
-      @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(-20px); }
-        100% { opacity: 1; transform: translateY(0); }
+      .field-error {
+        color: var(--error-color);
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
       }
 
-      @keyframes slideIn {
-        0% { transform: translateY(100px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
+      .text-center {
+        text-align: center;
       }
     `;
 
@@ -149,61 +117,77 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     };
   }, []);
 
-  // Update the handleSubmit function in Login.tsx
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let valid = true;
+
+    if (!email) {
+      setEmailError('Email is required');
+      valid = false;
+    } else {
+      setEmailError('');
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    if (!valid) return;
+
     try {
       const response = await login(email, password);
       setToken(response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user info
-      console.log('data',response.data.user);
-      
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       setIsAuthenticated(true);
       navigate('/home');
     } catch (err) {
       setError('Invalid credentials');
+      toast.error('Invalid username or password');
     }
   };
-  
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2 className="login-title">Login</h2>
-        {error && <p className="error-message">{error}</p>}
-        <div className="input-group">
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder=" "
-            className="input-field"
-          />
-          <label htmlFor="email" className="input-label">Email</label>
-        </div>
-        <div className="input-group">
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder=" "
-            className="input-field"
-          />
-          <label htmlFor="password" className="input-label">Password</label>
-        </div>
-        <button type="submit" className="submit-button">Login</button>
-      </form>
-      <p className="text-center text-sm text-gray-500 mt-4">
-          Do not have an account?{' '}
+    <>
+      <Toaster />
+      <div className="login-container">
+        <form onSubmit={handleSubmit} className="login-form">
+          <h2 className="login-title">Login</h2>
+          {error && <p className="error-message">{error}</p>}
+          <div className="input-group">
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="input-field"
+            />
+            {emailError && <p className="field-error">{emailError}</p>}
+          </div>
+          <div className="input-group">
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="input-field"
+            />
+            {passwordError && <p className="field-error">{passwordError}</p>}
+          </div>
+          <button type="submit" className="submit-button">Login</button>
+        </form>
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Don't have an account?{' '}
           <a href="/register" className="text-indigo-600 hover:underline">
-            SignUp
+            Sign Up
           </a>
         </p>
-    </div>
+      </div>
+    </>
   );
 };
 
