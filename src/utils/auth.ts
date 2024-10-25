@@ -1,4 +1,3 @@
-// utils/auth.ts
 
 export const getToken = (): string | null => {
     return localStorage.getItem('token'); // Assuming token is stored in local storage
