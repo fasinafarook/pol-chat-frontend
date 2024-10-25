@@ -1,7 +1,7 @@
 // services/socketService.ts
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = 'https://poll-app-ci3g.onrender.com';
 let socket: Socket;
 
 export const initSocket = () => {
