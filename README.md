@@ -1,46 +1,177 @@
-# Getting Started with Create React App
+poll-app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+```markdown
+# Poll App
 
-## Available Scripts
+A poll application where users can create, vote, and view polls. The project is built using **React** with **TypeScript** and styled with **Tailwind CSS**. The backend is hosted on **Render**, and the frontend on **Vercel**.
 
-In the project directory, you can run:
+## Table of Contents
+- [Features](#features)
+- [Live Demo](#live-demo)
+- [Installation](#installation)
+- [Backend Setup](#backend-setup)
+- [Frontend Setup](#frontend-setup)
+- [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [Scripts](#scripts)
+- [Folder Structure](#folder-structure)
+- [Technologies Used](#technologies-used)
+- [Acknowledgments](#acknowledgments)
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Features
+- User registration and login (JWT authentication)
+- Create, view, and vote on polls
+- Real-time chat functionality using Socket.io
+- Responsive UI with Tailwind CSS
+- User poll management dashboard
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Live Demo
+Access the live application [here](https://poll-app-wheat-five.vercel.app/).
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
+- **Node.js** and **npm** installed
+- An account on **Render** (for backend) and **Vercel** (for frontend deployment)
 
-### `npm run build`
+### Clone Repository
+Clone this repository to your local machine:
+```bash
+git clone https://github.com/fasinafarook/pol-chat-frontend.git
+cd poll-app
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Backend Setup
+The backend is hosted on Render at `https://poll-app-ci3g.onrender.com`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
 
-### `npm run eject`
+2. Install backend dependencies:
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. Set up your backend environment variables in `.env`:
+   ```dotenv
+   PORT=5000
+   MONGODB_URI=your_mongodb_uri
+   JWT_SECRET=your_jwt_secret
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Run the backend server:
+   ```bash
+   npm start
+   ```
+   Your backend server should now be running on `http://localhost:5000`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Frontend Setup
 
-## Learn More
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Set up your frontend environment variables in `.env.local`:
+   ```dotenv
+   REACT_APP_API_URL=https://poll-app-ci3g.onrender.com/api
+   ```
+
+4. Start the frontend server:
+   ```bash
+   npm start
+   ```
+   Your frontend server should now be running on `http://localhost:3000`.
+
+---
+
+## Environment Variables
+
+### Backend
+Add the following environment variables in the `backend/.env` file:
+```dotenv
+PORT=5000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+```
+
+### Frontend
+Add the following environment variable in the `frontend/.env.local` file:
+```dotenv
+REACT_APP_API_URL=https://poll-app-ci3g.onrender.com/api
+```
+
+---
+
+## Usage
+1. Open the frontend app at `http://localhost:3000`.
+2. Register or login to access the poll functionalities.
+3. Navigate to different sections (create polls, view all polls, vote, and chat).
+
+---
+
+## Scripts
+
+### Backend
+- **`npm start`**: Start the server.
+- **`npm run dev`**: Start the server in development mode with hot reloading.
+
+### Frontend
+- **`npm start`**: Start the development server.
+- **`npm build`**: Create an optimized production build.
+- **`npm test`**: Run tests.
+
+---
+
+## Folder Structure
+
+```
+poll-app/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── utils/
+│   │   └── app.js
+│   └── .env
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── App.tsx
+│   └── .env.local
+└── README.md
+```
+
+---
+
+## Technologies Used
+- **Frontend**: React, TypeScript, Tailwind CSS, Axios, React Router
+- **Backend**: Node.js, Express, MongoDB, Socket.io
+- **Authentication**: JSON Web Tokens (JWT)
+- **Deployment**: Render (backend), Vercel (frontend)
+
+---
+
+## Acknowledgments
+Thank you for using the Poll App! If you have any questions, feel free to open an issue or reach out.
+```
+
+This README should help guide users through both setting up and understanding the application’s structure, usage, and technologies used. Adjust details as necessary for your specific deployment settings and project updates.
